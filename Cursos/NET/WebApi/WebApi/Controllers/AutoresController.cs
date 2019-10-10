@@ -6,30 +6,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Context;
 using WebApi.Entities;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController] //Esto me permite obviar validar el modelo
     public class AutoresController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IAutoresService _autoresService;
 
-        public AutoresController(ApplicationDbContext db)
+        public AutoresController(IAutoresService autoresService)
         {
-            _db = db;
+            _autoresService = autoresService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Autor>>> Get()
         {
-            return await _db.Autores.ToListAsync();
+            return await _autoresService.Get();
         }
 
         [HttpGet("id", Name = "ObtenerAutor")]
         public async Task<ActionResult<Autor>> Get(int id)
         {
-            Autor autor = await _db.Autores.FirstOrDefaultAsync(x => x.Id == id);
+            Autor autor = await _autoresService.Get(id);
             if (autor == null)
                 return NotFound();
 
@@ -39,8 +40,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Autor autor)
         {
-            _db.Add(autor);
-            await _db.SaveChangesAsync();
+            await _autoresService.Post(autor);
             return new CreatedAtRouteResult("ObtenerAutor", new { id = autor.Id }, autor);
         }
 
@@ -50,21 +50,18 @@ namespace WebApi.Controllers
             if (id != autor.Id)
                 return BadRequest();
 
-            _db.Entry(autor).State = EntityState.Modified;
-            await _db.SaveChangesAsync();
+            await _autoresService.Put(autor);
             return Ok();
         }
 
         [HttpDelete("id")]
         public async Task<ActionResult<Autor>> Delete(int id)
         {
-            Autor autor = await _db.Autores.FirstOrDefaultAsync(x => x.Id == id);
+            Autor autor = await _autoresService.Delete(id);
 
             if (autor == null)
                 return NotFound();
 
-            _db.Autores.Remove(autor);
-            _db.SaveChanges();
             return autor;
         }
     }

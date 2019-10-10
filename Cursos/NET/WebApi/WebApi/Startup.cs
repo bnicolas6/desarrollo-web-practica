@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebApi.Context;
+using WebApi.Services;
 
 namespace WebApi
 {
@@ -27,6 +28,27 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            /*
+             *              #####   INYECCION DE DEPENDENCIAS: TIEMPO DE VIDA   #####
+             *              
+             * Transient: Cada vez que un servicio sea solicitado, se va a servir una nueva instancia de la clase
+             *            ## services.AddTransient<IClaseB, ClaseB>(); ##
+             * 
+             * Scoped: Se crea una instancia del servicio por cada solicitud Http diferente. Por ej.: Si varios
+             *         varios clientes hacen una peticion GET, se les entregara la misma instancia, en cambio si
+             *         un nuevo cliente realiza unapeticion POST, se le entregara una nueva instancia.
+             *         ## services.AddScoped<IClaseB, ClaseB>(); ##
+             * 
+             * Singleton: Se entregara siempre la misma instancia del servicio, a menos que el servidor sea
+             *            apagado y encendido nuevamente.
+             *            ## services.AddSingleton<IClaseB, ClaseB>(); ##
+             *            
+             *            
+             * IMPORTANTE: Si un servicio depende de DbContext, este servicio debe ser servido utilizando AddScoped
+             
+             */
+            services.AddScoped<IAutoresService, AutoresService>();
+            services.AddScoped<ILibrosService, LibrosService>();
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("Default")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
