@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebApi.Context;
+using WebApi.Helpers;
 using WebApi.Services;
 
 namespace WebApi
@@ -47,6 +49,17 @@ namespace WebApi
              * IMPORTANTE: Si un servicio depende de DbContext, este servicio debe ser servido utilizando AddScoped
              
              */
+
+            /* Inicio : Configuracion AutoMapper */
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            /* Fin : Configuracion AutoMapper */
+
             services.AddScoped<IAutoresService, AutoresService>();
             services.AddScoped<ILibrosService, LibrosService>();
             services.AddDbContext<ApplicationDbContext>(options =>

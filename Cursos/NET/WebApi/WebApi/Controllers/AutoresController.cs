@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Context;
 using WebApi.Entities;
+using WebApi.Models;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -28,13 +29,13 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("id", Name = "ObtenerAutor")]
-        public async Task<ActionResult<Autor>> Get(int id)
+        public async Task<ActionResult<AutorDTO>> Get(int id)
         {
-            Autor autor = await _autoresService.Get(id);
-            if (autor == null)
+            AutorDTO autorDTO = await _autoresService.Get(id);
+            if (autorDTO == null)
                 return NotFound();
 
-            return autor;
+            return autorDTO;
         }
 
         [HttpPost]

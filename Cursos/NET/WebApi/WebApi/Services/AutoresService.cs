@@ -1,17 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApi.Context;
 using WebApi.Entities;
+using WebApi.Models;
 
 namespace WebApi.Services
 {
     public interface IAutoresService
     {
         Task<List<Autor>> Get();
-        Task<Autor> Get(int id);
+        Task<AutorDTO> Get(int id);
         Task<Autor> Post(Autor autor);
         Task Put(Autor autor);
         Task<Autor> Delete(int id);
@@ -19,9 +21,11 @@ namespace WebApi.Services
     public class AutoresService : IAutoresService
     {
         private readonly ApplicationDbContext _db;
-        public AutoresService(ApplicationDbContext db)
+        public readonly IMapper _mapper;
+        public AutoresService(ApplicationDbContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
         public async Task<List<Autor>> Get()
@@ -29,9 +33,10 @@ namespace WebApi.Services
             return await _db.Autores.ToListAsync();
         }
 
-        public async Task<Autor> Get(int id)
+        public async Task<AutorDTO> Get(int id)
         {
-            return await _db.Autores.FirstOrDefaultAsync(x => x.Id == id);
+            Autor autor = await _db.Autores.FirstOrDefaultAsync(x => x.Id == id);
+            return _mapper.Map<AutorDTO>(autor);
         }
 
         public async Task<Autor> Post(Autor autor)
